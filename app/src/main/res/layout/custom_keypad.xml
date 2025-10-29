@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keypadLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:alignmentMode="alignMargins"
+    android:columnCount="3"
+    android:rowCount="4"
+    android:layout_gravity="center"
+    android:layout_marginTop="20dp"
+    android:padding="10dp">
+
+    <Button android:id="@+id/btn1" style="@style/KeyStyle" android:text="1"/>
+    <Button android:id="@+id/btn2" style="@style/KeyStyle" android:text="2"/>
+    <Button android:id="@+id/btn3" style="@style/KeyStyle" android:text="3"/>
+    <Button android:id="@+id/btn4" style="@style/KeyStyle" android:text="4"/>
+    <Button android:id="@+id/btn5" style="@style/KeyStyle" android:text="5"/>
+    <Button android:id="@+id/btn6" style="@style/KeyStyle" android:text="6"/>
+    <Button android:id="@+id/btn7" style="@style/KeyStyle" android:text="7"/>
+    <Button android:id="@+id/btn8" style="@style/KeyStyle" android:text="8"/>
+    <Button android:id="@+id/btn9" style="@style/KeyStyle" android:text="9"/>
+    <View android:layout_width="0dp" android:layout_height="0dp" />
+    <Button android:id="@+id/btn0" style="@style/KeyStyle" android:text="0"/>
+    <ImageButton
+        android:id="@+id/btnBackspace"
+        android:src="@android:drawable/ic_input_delete"
+        android:background="@android:color/transparent"
+        android:layout_width="100dp"
+        android:layout_height="70dp"
+        android:tint="#e62e04" />
+</GridLayout>
