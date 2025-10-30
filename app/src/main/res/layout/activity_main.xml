@@ -20,8 +20,9 @@
             android:layout_height="48dp"
             android:src="@drawable/ic_profile_placeholder"
             android:scaleType="centerCrop"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentStart="false"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="25dp"
             android:background="@drawable/profile_circle_bg" />
 
         <!-- Name + Tap for Balance -->
@@ -31,11 +32,12 @@
             android:orientation="vertical"
             android:layout_toEndOf="@id/imgProfile"
             android:layout_marginStart="12dp"
-            android:layout_centerVertical="true">
+            android:layout_marginTop="25dp"
+            android:layout_centerVertical="false">
 
             <TextView
                 android:id="@+id/txtUserName"
-                android:text="Mehedi Hasan Sabuj"
+                android:text=""
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFFFFF"

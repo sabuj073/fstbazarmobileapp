@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#FFFFFF"
+    android:orientation="vertical"
     android:padding="24dp">
 
     <!-- Logo -->
@@ -17,88 +17,93 @@
 
     <!-- Title -->
     <TextView
-        android:text="Log In"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:text="Log In"
         android:textColor="#000"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp" />
+        android:textStyle="bold" />
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
         android:text="to your account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
         android:textColor="#666"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp" />
+        android:textSize="14sp" />
 
-    <!-- Account Number -->
+    <!-- Phone number label -->
     <TextView
-        android:text="Account Number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
+        android:text="Phone Number"
         android:textColor="#555"
-        android:layout_marginTop="24dp"/>
+        android:textStyle="bold" />
+
     <EditText
         android:id="@+id/edtPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:hint="+88XXXXXXXXXXX"
-        android:textColor="#000"
-        android:background="@null"
-        android:paddingBottom="8dp"
         android:layout_marginBottom="12dp"
+        android:background="@null"
+        android:backgroundTint="#AAA"
+        android:hint="+88XXXXXXXXXXX"
+        android:inputType="phone"
+        android:paddingBottom="8dp"
         android:singleLine="true"
-        android:backgroundTint="#AAA"/>
+        android:textColor="#000" />
 
-    <!-- PIN -->
+    <!-- OTP field (hidden until OTP sent) -->
     <TextView
-        android:text="PIN"
-        android:textStyle="bold"
+        android:id="@+id/lblOtp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Enter OTP"
         android:textColor="#555"
-        android:layout_marginTop="8dp"/>
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
+
     <EditText
         android:id="@+id/edtPin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter PIN"
-        android:inputType="numberPassword"
-        android:textColor="#000"
         android:background="@null"
+        android:backgroundTint="#AAA"
+        android:hint="Enter OTP"
+        android:inputType="number"
         android:paddingBottom="8dp"
         android:singleLine="true"
-        android:backgroundTint="#AAA"/>
+        android:textColor="#000"
+        android:visibility="gone" />
 
+    <!-- Resend text -->
     <TextView
-        android:id="@+id/txtForgot"
-        android:text="Forgot PIN? Try PIN Reset"
-        android:layout_width="match_parent"
+        android:id="@+id/txtResend"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Didn’t get the OTP? Resend"
         android:textColor="#e62e04"
         android:textSize="13sp"
-        android:layout_marginTop="6dp"/>
+        android:visibility="gone"
+        android:layout_marginTop="4dp" />
 
-    <!-- Login Button -->
+    <!-- Button -->
     <Button
         android:id="@+id/btnNext"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="Next"
-        android:textColor="#FFF"
-        android:textSize="16sp"
-        android:backgroundTint="#e62e04"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:fontFamily="sans-serif-medium" />
+        android:backgroundTint="#e62e04"
+        android:fontFamily="sans-serif-medium"
+        android:text="Send OTP"
+        android:textColor="#FFF"
+        android:textSize="16sp" />
 
-    <!-- Custom Numeric Keypad -->
-    <include layout="@layout/custom_keypad"/>
+    <!-- Custom Keypad -->
+    <include layout="@layout/custom_keypad" />
 
 </LinearLayout>
