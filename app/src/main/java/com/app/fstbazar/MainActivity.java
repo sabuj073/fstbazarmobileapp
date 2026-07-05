@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     TextView txtGreeting, txtUserName, txtTapForBalance, txtPhone;
     ApiService api;
     private boolean autoHideBalanceAfterFetch;
+    private static final String BALANCE_PLACEHOLDER = "Tap to reveal balance";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         txtPhone = findViewById(R.id.txtPhone);
 
         txtGreeting.setText("Primary account");
+        txtTapForBalance.setText(BALANCE_PLACEHOLDER);
         String cachedPhone = getCachedPhone();
         txtPhone.setText(cachedPhone != null && !cachedPhone.isEmpty() ? cachedPhone : "Phone not available");
 
@@ -143,12 +145,10 @@ public class MainActivity extends AppCompatActivity {
                             String balance = String.valueOf(user.get("balance"));
 
                             txtUserName.setText(name != null ? name : "Unknown User");
-                            if (balance != null && !balance.equals("null") && !balance.isEmpty()) {
+                            if (autoHideBalanceAfterFetch && balance != null && !balance.equals("null") && !balance.isEmpty()) {
                                 txtTapForBalance.setText("৳ " + balance);
-                                if (autoHideBalanceAfterFetch) {
-                                    scheduleBalanceHide();
-                                    autoHideBalanceAfterFetch = false;
-                                }
+                                scheduleBalanceHide();
+                                autoHideBalanceAfterFetch = false;
                             }
 
                             if (avatar != null && !avatar.equals("null") && !avatar.isEmpty()) {
@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<Map<String, Object>> call, Throwable t) {
                 txtUserName.setText("Error");
                 Log.e("USER_API_FAIL", "Error: " + t.getMessage());
+                autoHideBalanceAfterFetch = false;
             }
         });
     }
@@ -248,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void scheduleBalanceHide() {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            txtTapForBalance.setText("Tap to reveal balance");
+            txtTapForBalance.setText(BALANCE_PLACEHOLDER);
         }, 6000);
     }
 }

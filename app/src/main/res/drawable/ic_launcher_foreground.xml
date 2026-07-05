@@ -1,7 +1,9 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:width="96dp"
-        android:height="96dp"
-        android:gravity="center"
-        android:drawable="@drawable/ic_fst_group_mark" />
+        android:gravity="center">
+        <bitmap
+            android:antialias="true"
+            android:gravity="center"
+            android:src="@drawable/ic_launcher_brand_foreground" />
+    </item>
 </layer-list>
