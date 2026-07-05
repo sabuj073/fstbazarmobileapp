@@ -29,4 +29,11 @@ public interface ApiService {
     @GET("v1/auth/user")
     Call<Map<String, Object>> getUser(@Header("Authorization") String token);
 
+    @Headers("Accept: application/json")
+    @POST("v2/wallet/send-money")
+    Call<Map<String, Object>> sendMoney(
+            @Header("Authorization") String token,
+            @Body Map<String, Object> body
+    );
+
 }

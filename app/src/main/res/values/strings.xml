@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">FstBazar</string>
+    <string name="app_name">Fst Group</string>
+    <string name="logout">Logout</string>
+    <string name="qr_scan">QR Scan</string>
+    <string name="send_money">Send Money</string>
+    <string name="recipient_number">Recipient Number *</string>
+    <string name="enter_phone_number">Enter phone number</string>
+    <string name="scan_qr_hint">Or scan recipient\'s QR code</string>
+    <string name="scan_qr_action">Scan QR</string>
+    <string name="amount_label">Amount *</string>
+    <string name="enter_amount">Enter amount (Tk)</string>
+    <string name="send_action">Send</string>
+    <string name="back">Back</string>
+    <string name="payment_successful">Payment Successful</string>
+    <string name="close">Close</string>
+    <string name="account">Account</string>
+    <string name="time">Time</string>
+    <string name="amount">Amount</string>
+    <string name="charge">Charge</string>
+    <string name="transaction_id">Transaction ID</string>
+    <string name="reference">Reference</string>
 </resources>

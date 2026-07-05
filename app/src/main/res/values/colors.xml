@@ -2,4 +2,39 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="brand_primary">#173B6C</color>
+    <color name="brand_primary_dark">#0E2646</color>
+    <color name="brand_secondary">#F5F7FB</color>
+    <color name="brand_accent">#F28C28</color>
+    <color name="brand_accent_dark">#D67211</color>
+    <color name="app_background">#F4F6FA</color>
+
+    <color name="text_primary">#122033</color>
+    <color name="text_muted">#6C7A90</color>
+    <color name="surface_card">#FFFFFFFF</color>
+    <color name="surface_soft">#ECF1F8</color>
+    <color name="stroke_soft">#D7E0EC</color>
+
+    <color name="login_top_start">#12396D</color>
+    <color name="login_top_end">#214F8E</color>
+    <color name="login_title_soft">#C9D8EF</color>
+    <color name="login_chip_bg">#26FFFFFF</color>
+    <color name="login_chip_text">#F4F8FF</color>
+    <color name="login_badge_bg">#1AF28C28</color>
+    <color name="login_badge_text">#FFD7A5</color>
+
+    <color name="home_header_bg">#173B6C</color>
+    <color name="home_header_bg_end">#225696</color>
+    <color name="home_header_soft">#BFD1E9</color>
+    <color name="home_card_top">#1E4D88</color>
+    <color name="home_card_bottom">#163A67</color>
+    <color name="home_card_soft">#AFC5E3</color>
+    <color name="balance_pill_bg">#1FF28C28</color>
+    <color name="promo_start">#F28C28</color>
+    <color name="promo_end">#D86E14</color>
+    <color name="bank_header_start">#225FA7</color>
+    <color name="bank_header_end">#0E3567</color>
+    <color name="success_accent">#F04A00</color>
+    <color name="dialog_dim">#73000000</color>
 </resources>

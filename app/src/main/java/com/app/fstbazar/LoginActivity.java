@@ -2,6 +2,9 @@ package com.app.fstbazar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.graphics.Rect;
+import android.view.WindowManager;
+import android.view.ViewTreeObserver;
 import android.widget.*;
 import android.view.View;
 import android.content.Intent;
@@ -14,10 +17,9 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     EditText edtPhone, edtPin;
-    TextView lblOtp, txtResend;
+    TextView lblOtp, txtResend, txtOtpInfo;
     Button btnNext;
-    Button[] numButtons;
-    ImageButton btnBackspace;
+    ScrollView loginScrollView;
     ApiService api;
 
     boolean otpSent = false;
@@ -26,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_login);
 
         SharedPreferences prefs = getSharedPreferences("FST_APP", MODE_PRIVATE);
@@ -36,42 +39,17 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
-
-
-
-
-
-
         // 🔹 Initialize Views
         edtPhone = findViewById(R.id.edtPhone);
         edtPin = findViewById(R.id.edtPin);
         lblOtp = findViewById(R.id.lblOtp);
         txtResend = findViewById(R.id.txtResend);
+        txtOtpInfo = findViewById(R.id.txtOtpInfo);
         btnNext = findViewById(R.id.btnNext);
-        btnBackspace = findViewById(R.id.btnBackspace);
+        loginScrollView = findViewById(R.id.loginScrollView);
         api = ApiClient.getClient().create(ApiService.class);
 
-        // 🔹 Numeric Keypad Setup
-        numButtons = new Button[]{
-                findViewById(R.id.btn0), findViewById(R.id.btn1), findViewById(R.id.btn2),
-                findViewById(R.id.btn3), findViewById(R.id.btn4), findViewById(R.id.btn5),
-                findViewById(R.id.btn6), findViewById(R.id.btn7), findViewById(R.id.btn8),
-                findViewById(R.id.btn9)
-        };
-
-        for (Button b : numButtons) {
-            b.setOnClickListener(v -> {
-                String text = ((Button) v).getText().toString();
-                if (otpSent) edtPin.append(text);
-                else edtPhone.append(text);
-            });
-        }
-
-        btnBackspace.setOnClickListener(v -> {
-            EditText target = otpSent ? edtPin : edtPhone;
-            int len = target.getText().length();
-            if (len > 0) target.getText().delete(len - 1, len);
-        });
+        setupKeyboardAwareScrolling();
 
         // 🔹 Main Button Logic
         btnNext.setOnClickListener(v -> {
@@ -81,6 +59,42 @@ public class LoginActivity extends AppCompatActivity {
 
         // 🔹 Resend OTP
         txtResend.setOnClickListener(v -> sendOtp());
+    }
+
+    private void setupKeyboardAwareScrolling() {
+        View rootView = findViewById(android.R.id.content);
+
+        ViewTreeObserver.OnGlobalLayoutListener listener = () -> {
+            Rect visibleFrame = new Rect();
+            rootView.getWindowVisibleDisplayFrame(visibleFrame);
+            int screenHeight = rootView.getRootView().getHeight();
+            int keypadHeight = screenHeight - visibleFrame.bottom;
+
+            if (keypadHeight > screenHeight * 0.15f) {
+                View focusedView = getCurrentFocus();
+                if (focusedView != null) {
+                    loginScrollView.post(() ->
+                            loginScrollView.smoothScrollTo(0, Math.max(0, focusedView.getTop() - 180))
+                    );
+                }
+            }
+        };
+
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(listener);
+
+        View.OnFocusChangeListener focusChangeListener = (view, hasFocus) -> {
+            if (hasFocus) {
+                loginScrollView.postDelayed(() ->
+                        loginScrollView.smoothScrollTo(0, Math.max(0, view.getTop() - 180)), 180);
+            }
+        };
+
+        edtPhone.setOnFocusChangeListener(focusChangeListener);
+        edtPin.setOnFocusChangeListener(focusChangeListener);
+        edtPhone.setOnClickListener(v -> loginScrollView.postDelayed(() ->
+                loginScrollView.smoothScrollTo(0, Math.max(0, edtPhone.getTop() - 180)), 120));
+        edtPin.setOnClickListener(v -> loginScrollView.postDelayed(() ->
+                loginScrollView.smoothScrollTo(0, Math.max(0, edtPin.getTop() - 180)), 120));
     }
 
     /**
@@ -95,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
 
         btnNext.setEnabled(false);
         btnNext.setText("Sending...");
+        txtOtpInfo.setText("Preparing your secure verification code...");
 
         Map<String, String> body = new HashMap<>();
         body.put("phone", enteredPhone);
@@ -112,9 +127,13 @@ public class LoginActivity extends AppCompatActivity {
                     lblOtp.setVisibility(View.VISIBLE);
                     edtPin.setVisibility(View.VISIBLE);
                     txtResend.setVisibility(View.VISIBLE);
+                    txtOtpInfo.setText("We sent an OTP to " + enteredPhone + ". Enter it below to continue.");
+                    btnNext.setText("Verify OTP");
+                    edtPin.requestFocus();
 
                     Toast.makeText(LoginActivity.this, "OTP sent successfully", Toast.LENGTH_SHORT).show();
                 } else {
+                    txtOtpInfo.setText("We couldn't send the OTP right now. Please try again.");
                     Toast.makeText(LoginActivity.this, "Failed to send OTP", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -123,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<Map<String, Object>> call, Throwable t) {
                 btnNext.setEnabled(true);
                 btnNext.setText("Send OTP");
+                txtOtpInfo.setText("Network issue while sending OTP. Please try again.");
                 Toast.makeText(LoginActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -140,6 +160,7 @@ public class LoginActivity extends AppCompatActivity {
 
         btnNext.setEnabled(false);
         btnNext.setText("Verifying...");
+        txtOtpInfo.setText("Verifying your OTP securely...");
 
         Map<String, String> body = new HashMap<>();
         body.put("phone", enteredPhone);
@@ -149,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
                 btnNext.setEnabled(true);
-                btnNext.setText("Next");
+                btnNext.setText("Verify OTP");
 
                 if (response.isSuccessful() && response.body() != null && Boolean.TRUE.equals(response.body().get("success"))) {
 
@@ -176,6 +197,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 } else {
+                    txtOtpInfo.setText("The OTP did not match. Please enter the latest code.");
                     Toast.makeText(LoginActivity.this, "Invalid OTP", Toast.LENGTH_SHORT).show();
                 }
 
@@ -185,6 +207,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<Map<String, Object>> call, Throwable t) {
                 btnNext.setEnabled(true);
                 btnNext.setText("Verify OTP");
+                txtOtpInfo.setText("Unable to verify OTP right now. Please try again.");
                 Toast.makeText(LoginActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

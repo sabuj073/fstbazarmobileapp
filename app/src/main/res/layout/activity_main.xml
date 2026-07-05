@@ -1,83 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/app_background"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true">
 
-    <!-- 🔹 Ultra Compact Curved Header -->
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="@drawable/curve_bg"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="15dp"> <!-- ⬅️ Reduced from 35dp to 15dp -->
-
-        <!-- Profile Picture -->
-        <ImageView
-            android:id="@+id/imgProfile"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_profile_placeholder"
-            android:scaleType="centerCrop"
-            android:layout_alignParentStart="false"
-            android:layout_centerVertical="false"
-            android:layout_marginTop="25dp"
-            android:background="@drawable/profile_circle_bg" />
-
-        <!-- Name + Tap for Balance -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_toEndOf="@id/imgProfile"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="25dp"
-            android:layout_centerVertical="false">
-
-            <TextView
-                android:id="@+id/txtUserName"
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="3dp" />
-
-            <TextView
-                android:id="@+id/txtTapForBalance"
-                android:text="Tap for Balance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#e62e04"
-                android:textSize="12sp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
-                android:background="@drawable/balance_chip_bg"
-                android:gravity="center" />
-        </LinearLayout>
-    </RelativeLayout>
-
-    <!-- 🔹 Icon Grid -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerSites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="-6dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="8dp"
-        android:clipToPadding="false"
-        android:paddingHorizontal="8dp" />
-
-    <!-- 🔹 Banner Slider -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/bannerViewPager"
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:layout_marginTop="10dp"
-        android:clipToPadding="false"
+        android:layout_height="66dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_bottom_nav"
         android:clipChildren="false"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp" />
-</LinearLayout>
+        android:clipToPadding="false"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="2dp"
+        android:paddingTop="4dp">
+
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_home" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Home"
+                android:textColor="@color/brand_primary"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navQr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_qr_nav"
+                android:elevation="10dp"
+                android:translationY="-22dp">
+
+                <ImageView
+                    android:id="@+id/btnQrScan"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/qr_scan"
+                    android:src="@drawable/ic_qr_scan" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:text="QR Scan"
+                android:textColor="@color/brand_primary"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navLogout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btnLogout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/logout"
+                android:src="@drawable/ic_logout_blue" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Logout"
+                android:textColor="@color/brand_primary"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavBar"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_home_reference_header"
+                android:orientation="vertical"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="12dp">
+
+                    <ImageView
+                        android:id="@+id/imgProfile"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_profile_ring"
+                        android:padding="3dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile_placeholder" />
+
+                    <TextView
+                        android:id="@+id/txtUserName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="Guest User"
+                        android:textColor="@color/white"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/imgBell"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_bell" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="#30FFFFFF" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@drawable/bg_account_card"
+                    android:elevation="8dp"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="FST Group"
+                            android:textColor="@color/white"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/txtTapForBalance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="22dp"
+                        android:text="Tap for Balance"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtGreeting"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:text="Primary account"
+                        android:textColor="#C7D9F8"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/txtPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="01XXXXXXXXX"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_header_glow_separator" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="vertical"
+                android:paddingTop="0dp"
+                android:paddingBottom="14dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerSites"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    android:paddingHorizontal="12dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>

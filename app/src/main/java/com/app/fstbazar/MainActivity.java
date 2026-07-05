@@ -1,23 +1,21 @@
 package com.app.fstbazar;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +27,17 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String PREFS_NAME = "FST_APP";
+    private static final String KEY_BALANCE_REFRESH_REQUIRED = "balance_refresh_required";
+
     RecyclerView recyclerSites;
     ArrayList<SiteModel> siteList;
     SiteAdapter adapter;
-    ImageView imgProfile;
-    TextView txtUserName, txtTapForBalance;
-    ViewPager2 bannerViewPager;
-    BannerAdapter bannerAdapter;
-    List<String> bannerUrls;
-    Handler bannerHandler;
+    ImageView btnLogout, btnQrScan, imgProfile;
+    LinearLayout navHome;
+    TextView txtGreeting, txtUserName, txtTapForBalance, txtPhone;
     ApiService api;
+    private boolean autoHideBalanceAfterFetch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,34 +45,37 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerSites = findViewById(R.id.recyclerSites);
-        recyclerSites.setLayoutManager(new GridLayoutManager(this, 4));
+        recyclerSites.setLayoutManager(new GridLayoutManager(this, 3));
         siteList = new ArrayList<>();
 
-        bannerViewPager = findViewById(R.id.bannerViewPager);
-        bannerUrls = new ArrayList<>();
-        bannerHandler = new Handler(Looper.getMainLooper());
-
+        btnLogout = findViewById(R.id.btnLogout);
+        btnQrScan = findViewById(R.id.btnQrScan);
+        navHome = findViewById(R.id.navHome);
         imgProfile = findViewById(R.id.imgProfile);
+        txtGreeting = findViewById(R.id.txtGreeting);
         txtUserName = findViewById(R.id.txtUserName);
         txtTapForBalance = findViewById(R.id.txtTapForBalance);
+        txtPhone = findViewById(R.id.txtPhone);
+
+        txtGreeting.setText("Primary account");
+        String cachedPhone = getCachedPhone();
+        txtPhone.setText(cachedPhone != null && !cachedPhone.isEmpty() ? cachedPhone : "Phone not available");
 
         Glide.with(this).load(R.drawable.ic_profile_placeholder).into(imgProfile);
 
         api = ApiClient.getClient().create(ApiService.class);
 
         loadSites();
-        loadBanners();
         fetchUserData();
 
-        // Fetch balance on tap
+        btnLogout.setOnClickListener(v -> logout());
+        btnQrScan.setOnClickListener(v -> startActivity(new Intent(this, SendMoneyActivity.class)));
+        navHome.setOnClickListener(v -> Toast.makeText(this, "You are already on Home", Toast.LENGTH_SHORT).show());
+
         txtTapForBalance.setOnClickListener(v -> fetchBalance());
     }
 
     private void loadSites() {
-        SharedPreferences prefs = getSharedPreferences("FST_APP", MODE_PRIVATE);
-        String token = prefs.getString("token", null);
-        String userPhone = prefs.getString("user_phone", null); // optional cache
-
         api.getSites().enqueue(new Callback<Map<String, Object>>() {
             @Override
             public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
@@ -90,8 +92,7 @@ public class MainActivity extends AppCompatActivity {
                                     String name = String.valueOf(obj.get("name"));
                                     String logo = String.valueOf(obj.get("logo"));
                                     String link = String.valueOf(obj.get("slug"));
-                                    String userPhone = null;
-                                    userPhone = getCachedPhone();
+                                    String userPhone = getCachedPhone();
 
                                     if (userPhone != null && !userPhone.isEmpty()) {
                                         if (link.contains("?")) {
@@ -123,9 +124,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     private void fetchUserData() {
-        SharedPreferences prefs = getSharedPreferences("FST_APP", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String token = prefs.getString("token", null);
         if (token == null) return;
 
@@ -135,15 +135,21 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         Map<String, Object> root = response.body();
-                        Map<String, Object> user = (Map<String, Object>) root.get("user");  // ✅ get inside "user"
+                        Map<String, Object> user = (Map<String, Object>) root.get("user");
 
                         if (user != null) {
                             String name = String.valueOf(user.get("name"));
-                            String balance = String.valueOf(user.get("balance"));
                             String avatar = String.valueOf(user.get("avatar_original"));
+                            String balance = String.valueOf(user.get("balance"));
 
                             txtUserName.setText(name != null ? name : "Unknown User");
-                           // txtTapForBalance.setText("৳ " + balance);
+                            if (balance != null && !balance.equals("null") && !balance.isEmpty()) {
+                                txtTapForBalance.setText("৳ " + balance);
+                                if (autoHideBalanceAfterFetch) {
+                                    scheduleBalanceHide();
+                                    autoHideBalanceAfterFetch = false;
+                                }
+                            }
 
                             if (avatar != null && !avatar.equals("null") && !avatar.isEmpty()) {
                                 Glide.with(MainActivity.this)
@@ -175,81 +181,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
-    private void loadBanners() {
-        api.getBanners().enqueue(new Callback<Map<String, Object>>() {
-            @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        Object dataObj = response.body().get("data");
-                        if (dataObj instanceof List) {
-                            List<?> list = (List<?>) dataObj;
-                            bannerUrls.clear();
-
-                            for (Object item : list) {
-                                if (item instanceof Map) {
-                                    Map<?, ?> obj = (Map<?, ?>) item;
-                                    String photo = String.valueOf(obj.get("photo"));
-                                    if (photo != null && !photo.startsWith("http")) {
-                                        photo = "https://fstbazar.com" + photo;
-                                    }
-                                    bannerUrls.add(photo);
-                                }
-                            }
-
-                            bannerAdapter = new BannerAdapter(MainActivity.this, bannerUrls);
-                            bannerViewPager.setAdapter(bannerAdapter);
-                            startAutoSlide();
-                        }
-                    } catch (Exception e) {
-                        Log.e("BANNER_PARSE", "Error parsing: " + e);
-                    }
-                } else {
-                    Toast.makeText(MainActivity.this, "Failed to load banners", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
     private String getCachedPhone() {
-        SharedPreferences prefs = getSharedPreferences("FST_APP", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         return prefs.getString("phone", null);
     }
 
-
-
-    private void startAutoSlide() {
-        bannerHandler.postDelayed(new Runnable() {
-            int currentPage = 0;
-
-            @Override
-            public void run() {
-                if (bannerAdapter != null && bannerAdapter.getItemCount() > 0) {
-                    currentPage = (currentPage + 1) % bannerAdapter.getItemCount();
-                    bannerViewPager.setCurrentItem(currentPage, true);
-                    bannerHandler.postDelayed(this, 4000);
-                }
-            }
-        }, 4000);
-    }
-
     private void fetchBalance() {
-        SharedPreferences prefs = getSharedPreferences("FST_APP", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String token = prefs.getString("token", null);
         if (token == null) {
             Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        txtTapForBalance.setText("Checking...");
+        txtTapForBalance.setText("Checking balance...");
         api.getUser("Bearer " + token).enqueue(new Callback<Map<String, Object>>() {
             @Override
             public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
@@ -259,11 +204,7 @@ public class MainActivity extends AppCompatActivity {
                         if (user != null) {
                             String balance = String.valueOf(user.get("balance"));
                             txtTapForBalance.setText("৳ " + balance);
-
-                            // ✅ Reset to "Tap for balance" after 1 minute
-                            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                                txtTapForBalance.setText("Tap for balance");
-                            }, 6000); // 60,000 ms = 1 minute
+                            scheduleBalanceHide();
 
                         } else {
                             txtTapForBalance.setText("Balance unavailable");
@@ -284,4 +225,30 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void logout() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().clear().apply();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        if (prefs.getBoolean(KEY_BALANCE_REFRESH_REQUIRED, false)) {
+            prefs.edit().putBoolean(KEY_BALANCE_REFRESH_REQUIRED, false).apply();
+            autoHideBalanceAfterFetch = true;
+            fetchUserData();
+        }
+    }
+
+    private void scheduleBalanceHide() {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            txtTapForBalance.setText("Tap to reveal balance");
+        }, 6000);
+    }
 }
